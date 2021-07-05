@@ -50,8 +50,8 @@ function Home() {
             <View style={styles.line}></View>
 
             {loading ?
-                <ActivityIndicator size="large" color="#0000ff" style={{marginTop: 10}}/> :
-                <View style={{ flex: 1, flexDirection: 'row', alignSelf: 'center', marginTop: 10 }}>
+                <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
+                <View style={{ flex: 1, flexDirection: 'column', alignSelf: 'center', marginTop: 10 }}>
                     <FlatList
                         data={assignState}
                         renderItem={({ item }) =>
@@ -76,15 +76,16 @@ function Home() {
                         }
                         keyExtractor={(item) => item.id}
                     />
+                    <View>
+                        <TouchableOpacity
+                            style={styles.btnAdd}
+                            onPress={() => navigation.navigate('addContacts')}>
+                            <Icon name="plus" size={35} color="#FFF" style={{ alignSelf: 'center' }} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             }
-            <View>
-                <TouchableOpacity
-                    style={styles.btnAdd}
-                    onPress={() => navigation.navigate('addContacts')}>
-                    <Icon name="plus" size={35} color="#FFF" style={{ alignSelf: 'center' }} />
-                </TouchableOpacity>
-            </View>
+
         </View>
     )
 }
@@ -153,7 +154,6 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         marginTop: 15,
         marginBottom: 30,
-        marginRight: 30,
         justifyContent: 'center',
     },
     container: {

@@ -31,16 +31,19 @@ function AddContacts() {
 
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
-            console.log(res);
-            setPhoto(res.assets[0].uri)
-            console.log('ini poto', photo)
-            const reference = storage().ref('/photos/' + res.assets[0].fileName)
-            await reference.putFile(res.assets[0].uri)
-            setLoading(true)
-            const url = await reference.getDownloadURL()
-            setPhoto(url)
-            setLoading(false)
-            console.log(url);
+            if (res.didCancel == true) {
+                ToastAndroid.show("Cancel added image", ToastAndroid.LONG);
+            } else {
+                console.log("res", res);
+                setPhoto(res.assets[0].uri)
+                const reference = storage().ref('/photos/' + res.assets[0].fileName)
+                await reference.putFile(res.assets[0].uri)
+                setLoading(true)
+                const url = await reference.getDownloadURL()
+                setPhoto(url)
+                setLoading(false)
+                console.log(url);
+            }
         })
     }
 
@@ -86,15 +89,15 @@ function AddContacts() {
             </View>
             <View style={{ flex: 1, marginTop: 20 }}>
                 {loading ?
-                <>
-                    <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> 
-                    <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text> 
-                </>:
+                    <>
+                        <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
+                        <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
+                    </> :
                     <TouchableOpacity onPress={chooseFile}>
                         <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
                     </TouchableOpacity>
                 }
-                
+
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`First Name`}</Text>
                     <TextInput

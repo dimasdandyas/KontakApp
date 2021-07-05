@@ -40,16 +40,19 @@ function EditContacts() {
 
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
-            console.log(res);
-            setPhoto(res.assets[0].uri)
-            console.log('ini poto', photo)
-            const reference = storage().ref('/photos/' + res.assets[0].fileName)
-            await reference.putFile(res.assets[0].uri)
-            setLoading(true)
-            const url = await reference.getDownloadURL()
-            setPhoto(url)
-            setLoading(false)
-            console.log(url);
+            if (res.didCancel == true) {
+                ToastAndroid.show("Cancel added image", ToastAndroid.LONG);
+            } else {
+                console.log("res", res);
+                setPhoto(res.assets[0].uri)
+                const reference = storage().ref('/photos/' + res.assets[0].fileName)
+                await reference.putFile(res.assets[0].uri)
+                setLoading(true)
+                const url = await reference.getDownloadURL()
+                setPhoto(url)
+                setLoading(false)
+                console.log(url);
+            }
         })
     }
 
