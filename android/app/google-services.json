@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "719089968018",
+    "project_id": "kontakapp-5d110",
+    "storage_bucket": "kontakapp-5d110.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719089968018:android:d26eafd59042920b11574b",
+        "android_client_info": {
+          "package_name": "com.kontakapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719089968018-1e0cu0c9f84gtqgh1f9to9ovtu4gfcna.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kontakapp",
+            "certificate_hash": "14d2f2c0049ebcc804877b6e553cf16866bea681"
+          }
+        },
+        {
+          "client_id": "719089968018-86asnjtouda5aflrb9hj8mndofdqc3il.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYiQYMjGQcOQd9A8whwIig9ByGtyVQBEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719089968018-86asnjtouda5aflrb9hj8mndofdqc3il.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

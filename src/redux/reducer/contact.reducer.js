@@ -1,5 +1,5 @@
 const ContactReducer = (state = [], action) => {
-    switch(action.type) {
+    switch (action.type) {
         case 'GET_CONTACTS':
             if (action.data) return [...state, ...action.data]
         case 'POST_CONTACT':
@@ -12,6 +12,9 @@ const ContactReducer = (state = [], action) => {
         case 'DELETE_CONTACT':
             const newState = state.filter(item => item.id !== action.data.id)
             return newState
+        case 'REFRESH_CONTACTS':
+            const refreshState = []
+            return refreshState
         default:
             return state
     }

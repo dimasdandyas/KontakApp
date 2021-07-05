@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Feather';
@@ -15,15 +15,30 @@ function Home() {
     const dispatch = useDispatch()
     const [data, setData] = useState('')
 
-    useEffect(() => {
-        getContacts()
-            .then(res => {
-                dispatch(GetContacts(res.data))
-                console.log(res.data)
-            })
-            .catch(error => {
+    useFocusEffect(useCallback(
+        () => {
+            if (assignState.length == 0) {
+                getContacts()
+                    .then(res => {
+                        dispatch(GetContacts(res.data))
+                        console.log(res.data)
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            }
+        }, [assignState]
+    ))
 
-            })
+    useEffect(() => {
+        // getContacts()
+        //     .then(res => {
+        //         dispatch(GetContacts(res.data))
+        //         console.log(res.data)
+        //     })
+        //     .catch(error => {
+
+        //     })
     }, [])
 
     return (

@@ -7,12 +7,18 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getContactId } from '../services/contact.services';
-import { launchImageLibrary } from 'react-native-image-picker'
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import { postContact } from '../services/contact.services';
+import { PostContact } from '../redux/action/contact.action';
+import { RefreshContact } from '../redux/action/contact.action';
 
 function AddContacts() {
 
+    const assignState = useSelector((state) => state.contactReducer)
     const navigation = useNavigation()
     const route = useRoute()
+    const dispatch = useDispatch()
     const [data, setData] = useState('')
     const [id, setId] = useState('')
     const [firstName, setFirstName] = useState('')
@@ -21,12 +27,39 @@ function AddContacts() {
     const [photo, setPhoto] = useState('')
 
     function chooseFile() {
-        launchImageLibrary({}, function (res) {
+        launchImageLibrary({}, async function (res) {
             console.log(res);
             setPhoto(res.assets[0].uri)
+            console.log('ini poto', photo)
+            const reference = storage().ref('/photos/' + res.assets[0].fileName)
+
+            await reference.putFile(res.assets[0].uri)
+            const url = await reference.getDownloadURL()
+            setPhoto(url)
+            console.log(url);
         })
     }
 
+    function NewContact() {
+        console.log('add contact')
+        const newContact = {
+            firstName: firstName,
+            lastName: lastName,
+            age: age,
+            photo: photo,
+        }
+        console.log(newContact)
+        postContact(newContact)
+            .then(res => {
+                console.log(res)
+                dispatch(RefreshContact(newContact))
+
+                navigation.navigate('home')
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -35,30 +68,34 @@ function AddContacts() {
                     style={{ marginLeft: 10, marginTop: 15, }}
                     onPress={() => navigation.goBack()} />
                 <Text style={styles.title}>{`Add Contact`}</Text>
-                <Icon name="check" size={35} color="#7E7E7E"
-                    style={{ marginRight: 20, marginTop: 15, }}
-                    onPress={() => navigation.goBack()} />
+                <TouchableOpacity onPress={() => NewContact()} >
+                    <Icon name="check" size={35} color="#7E7E7E"
+                        style={{ marginRight: 20, marginTop: 15, }} />
+                </TouchableOpacity>
             </View>
             <View style={{ flex: 1, marginTop: 20 }}>
                 <TouchableOpacity onPress={chooseFile}>
-                    <Image style={styles.image} width={150} height={150} source={photo == '' ?  require('../assets/img/account.png') : {uri: photo}}></Image>
+                    <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
                 </TouchableOpacity>
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`First Name`}</Text>
                     <TextInput
                         style={styles.textInput}
+                        onChangeText={firstName => setFirstName(firstName)}
                     />
                 </View>
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`Last Name`}</Text>
                     <TextInput
                         style={styles.textInput}
+                        onChangeText={lastName => setLastName(lastName)}
                     />
                 </View>
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`Age`}</Text>
                     <TextInput
                         style={styles.textInput}
+                        onChangeText={age => setAge(age)}
                     />
                 </View>
             </View>

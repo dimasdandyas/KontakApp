@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
+import { Alert, Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icons from 'react-native-vector-icons/Feather';
@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getContactId } from '../services/contact.services';
+import {deleteContact} from '../services/contact.services'
 
 function ContactDetails() {
 
@@ -38,6 +39,33 @@ function ContactDetails() {
 
             })
     }, [])
+
+    
+    function AlertDelete (id) {
+        Alert.alert (
+            "Delete this contact ?", "", 
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("No")
+                },
+                {
+                    text: "Yes",
+                    onPress: () => deleteContactList(id)
+                }
+            ]
+        );
+    }
+
+    function deleteContactList (id) {
+        deleteContact(id)
+        .then(res => {
+            dispatch(DeleteContact(id))
+        }, (error) => {
+            // console.log("error", error.data)
+            ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+        })
+    }
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -84,12 +112,13 @@ function ContactDetails() {
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                 <TouchableOpacity
                     style={styles.btn}
-                    onPress={() => navigation.navigate('editContacts')}>
+                    onPress={() => navigation.navigate('editContacts', {item : {id, firstName, lastName, age, photo}})}>
                     <Icons name="edit" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
                     <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.btn}>
+                    style={styles.btn}
+                    onPress={() => AlertDelete(id)}>
                     <Icons name="x" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
                     <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Delete</Text>
                 </TouchableOpacity>

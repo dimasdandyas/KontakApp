@@ -26,4 +26,11 @@ const DeleteContact = (data) => {
     }
 }
 
-export { GetContacts, PostContact, PutContact, DeleteContact }
+const RefreshContact = () => {
+    return {
+        type: 'REFRESH_CONTACTS',
+        data: []
+    }
+}
+
+export { GetContacts, PostContact, PutContact, DeleteContact, RefreshContact }
