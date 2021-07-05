@@ -41,7 +41,7 @@ function EditContacts() {
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
             if (res.didCancel == true) {
-                ToastAndroid.show("Cancel added image", ToastAndroid.LONG);
+                ToastAndroid.show("Cancel edited image", ToastAndroid.LONG);
             } else {
                 console.log("res", res);
                 setPhoto(res.assets[0].uri)
