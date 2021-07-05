@@ -28,7 +28,6 @@ function EditContacts() {
     }, [photo]))
 
     useEffect(() => {
-        console.log(route.params)
         const routes = route.params
         setId(routes.item.id)
         setFirstName(routes.item.firstName)
@@ -43,7 +42,6 @@ function EditContacts() {
             if (res.didCancel == true) {
                 ToastAndroid.show("Cancel edited image", ToastAndroid.LONG);
             } else {
-                console.log("res", res);
                 setPhoto(res.assets[0].uri)
                 const reference = storage().ref('/photos/' + res.assets[0].fileName)
                 await reference.putFile(res.assets[0].uri)
@@ -51,31 +49,26 @@ function EditContacts() {
                 const url = await reference.getDownloadURL()
                 setPhoto(url)
                 setLoading(false)
-                console.log(url);
             }
         })
     }
 
     function UpdateContact() {
         let messageError = validateContact(firstName, lastName, age, photo)
-        console.log('edit contact')
         const updateContact = {
             firstName: firstName,
             lastName: lastName,
             age: age,
             photo: photo,
         }
-        console.log('edit', updateContact)
         if (validateContact(firstName, lastName, age, photo) == '') {
             putContact(updateContact, id)
                 .then(res => {
-                    console.log(res)
                     dispatch(RefreshContact(updateContact))
                     navigation.navigate('home')
                     ToastAndroid.show("Edit contact succes!", ToastAndroid.LONG);
                 })
                 .catch(error => {
-                    console.log(error)
                     ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
                 })
         } else {

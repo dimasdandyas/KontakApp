@@ -25,7 +25,6 @@ function Home() {
                 getContacts()
                     .then(res => {
                         dispatch(GetContacts(res.data))
-                        console.log(res.data)
                     })
                     .finally(() => {
                         setLoading(false)
@@ -33,7 +32,7 @@ function Home() {
             }
         }
         catch (error) {
-            console.log(error)
+            ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
         }
     }
 

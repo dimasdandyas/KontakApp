@@ -34,7 +34,6 @@ function AddContacts() {
             if (res.didCancel == true) {
                 ToastAndroid.show("Cancel added image", ToastAndroid.LONG);
             } else {
-                console.log("res", res);
                 setPhoto(res.assets[0].uri)
                 const reference = storage().ref('/photos/' + res.assets[0].fileName)
                 await reference.putFile(res.assets[0].uri)
@@ -42,31 +41,26 @@ function AddContacts() {
                 const url = await reference.getDownloadURL()
                 setPhoto(url)
                 setLoading(false)
-                console.log(url);
             }
         })
     }
 
     function NewContact() {
-        console.log('add contact')
         const newContact = {
             firstName: firstName,
             lastName: lastName,
             age: age,
             photo: photo,
         }
-        console.log(newContact)
         let messageError = validateContact(firstName, lastName, age, photo)
         if (validateContact(firstName, lastName, age, photo) == '') {
             postContact(newContact)
                 .then(res => {
-                    console.log(res)
                     dispatch(RefreshContact(newContact))
                     navigation.navigate('home')
                     ToastAndroid.show("Add contact succes!", ToastAndroid.LONG);
                 })
                 .catch(error => {
-                    console.log(error)
                     ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
                 })
         } else {

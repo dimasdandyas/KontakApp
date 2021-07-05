@@ -26,7 +26,6 @@ function ContactDetails() {
     }, [photo]))
 
     useEffect(() => {
-        console.log(route.params)
         setLoading(true)
         getContactId(route.params.id)
             .then(res => {
@@ -52,7 +51,7 @@ function ContactDetails() {
             [
                 {
                     text: "No",
-                    onPress: () => console.log("No")
+                    onPress: () => ToastAndroid.show("Cancel removes contact", ToastAndroid.LONG)
                 },
                 {
                     text: "Yes",
@@ -66,6 +65,7 @@ function ContactDetails() {
         deleteContact(id)
             .then(res => {
                 dispatch(DeleteContact(id))
+                ToastAndroid.show("Success removes contact", ToastAndroid.LONG)
             }, (error) => {
                 ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
             })
