@@ -138,7 +138,6 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         color: '#333',
-        // backgroundColor: '#333',
         marginTop: 20,
     },
     line: {
@@ -155,15 +154,12 @@ const styles = StyleSheet.create({
     card: {
         width: 350,
         height: 70,
-        // backgroundColor: '#333',
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'center',
         marginTop: 10
     },
     image: {
-        // width: 50,
-        // height: 50,
         borderRadius: 100,
         backgroundColor: '#645DAF',
         alignSelf: 'center',
@@ -177,7 +173,6 @@ const styles = StyleSheet.create({
         width: 90,
         fontSize: 18,
         color: '#333',
-        // backgroundColor: '#333',
         marginLeft: 20,
         marginTop: 20,
         marginRight: 20,
@@ -186,7 +181,6 @@ const styles = StyleSheet.create({
         width: 260,
         fontSize: 18,
         color: '#333',
-        // backgroundColor: '#FFF',
         marginLeft: 20,
         marginTop: 5,
     },

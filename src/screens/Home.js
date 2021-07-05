@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
-import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Feather';
-import { createStackNavigator } from '@react-navigation/stack';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getContacts } from '../services/contact.services';
@@ -113,15 +111,12 @@ const styles = StyleSheet.create({
     card: {
         width: 350,
         height: 70,
-        // backgroundColor: '#333',
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'center',
         marginTop: 10
     },
     image: {
-        // width: 50,
-        // height: 50,
         borderRadius: 100,
         backgroundColor: '#645DAF'
     },
@@ -132,7 +127,6 @@ const styles = StyleSheet.create({
         width: 260,
         fontSize: 18,
         color: '#333',
-        // backgroundColor: '#FFF',
         marginLeft: 20,
 
     },
@@ -140,7 +134,6 @@ const styles = StyleSheet.create({
         width: 260,
         fontSize: 18,
         color: '#333',
-        // backgroundColor: '#FFF',
         marginLeft: 20,
         marginTop: 5,
 

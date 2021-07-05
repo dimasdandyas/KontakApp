@@ -1,16 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, FlatList, ActivityIndicator, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
-import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icons from 'react-native-vector-icons/Feather';
-import { createStackNavigator } from '@react-navigation/stack';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getContactId } from '../services/contact.services';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import { postContact } from '../services/contact.services';
-import { PostContact } from '../redux/action/contact.action';
 import { RefreshContact } from '../redux/action/contact.action';
 import validateContact from '../validation/contact.validation';
 
@@ -129,7 +124,6 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         color: '#333',
-        // backgroundColor: '#333',
         marginTop: 20,
     },
     line: {
@@ -146,15 +140,12 @@ const styles = StyleSheet.create({
     card: {
         width: 350,
         height: 70,
-        // backgroundColor: '#333',
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'center',
         marginTop: 10
     },
     image: {
-        // width: 50,
-        // height: 50,
         borderRadius: 100,
         backgroundColor: '#645DAF',
         alignSelf: 'center',
@@ -168,7 +159,6 @@ const styles = StyleSheet.create({
         width: 90,
         fontSize: 18,
         color: '#333',
-        // backgroundColor: '#333',
         marginLeft: 20,
         marginTop: 20,
         marginRight: 20,
@@ -177,7 +167,6 @@ const styles = StyleSheet.create({
         width: 260,
         fontSize: 18,
         color: '#333',
-        // backgroundColor: '#FFF',
         marginLeft: 20,
         marginTop: 5,
     },
