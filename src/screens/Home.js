@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Feather';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -7,6 +7,7 @@ import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/nativ
 import { useDispatch, useSelector } from 'react-redux';
 import { getContacts } from '../services/contact.services';
 import { GetContacts } from '../redux/action/contact.action';
+import axios from 'axios'
 
 function Home() {
 
@@ -14,32 +15,32 @@ function Home() {
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const [data, setData] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    useFocusEffect(useCallback(
-        () => {
+    const GetData = async () => {
+        try {
+            const data = await axios
             if (assignState.length == 0) {
+                setLoading(true)
                 getContacts()
                     .then(res => {
                         dispatch(GetContacts(res.data))
                         console.log(res.data)
                     })
-                    .catch(error => {
-                        console.log(error)
+                    .finally(() => {
+                        setLoading(false)
                     })
             }
-        }, [assignState]
-    ))
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
 
-    useEffect(() => {
-        // getContacts()
-        //     .then(res => {
-        //         dispatch(GetContacts(res.data))
-        //         console.log(res.data)
-        //     })
-        //     .catch(error => {
-
-        //     })
-    }, [])
+    useFocusEffect(useCallback(
+        () => {
+            GetData()
+        }, [assignState]))
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -47,33 +48,36 @@ function Home() {
                 <Text style={styles.title}>All Contacts</Text>
             </View>
             <View style={styles.line}></View>
-            <View style={{ flex: 1, flexDirection: 'row', alignSelf: 'center', marginTop: 10 }}>
-                <FlatList
-                    data={assignState}
-                    renderItem={({ item }) =>
-                        <>
-                            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('contactDetails', item)}>
-                                <View>
-                                    {
-                                        item.photo != 'N/A'
-                                            ?
-                                            <Image style={styles.image} width={50} height={50} source={{ uri: item.photo }} ></Image>
-                                            :
-                                            <Image style={styles.image} width={50} height={50} source={require('../assets/img/account.png')}></Image>
-                                    }
-                                </View>
 
-                                <View style={styles.viewText}>
-                                    <Text style={styles.textCard}>{item.firstName} {item.lastName}</Text>
-                                    <Text style={styles.textCard2}>{`Age ${item.age}`}</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <View style={styles.line2}></View>
-                        </>
-                    }
-                    keyExtractor={(item) => item.id}
-                />
-            </View>
+            {loading ?
+                <ActivityIndicator size="large" color="#0000ff" style={{marginTop: 10}}/> :
+                <View style={{ flex: 1, flexDirection: 'row', alignSelf: 'center', marginTop: 10 }}>
+                    <FlatList
+                        data={assignState}
+                        renderItem={({ item }) =>
+                            <>
+                                <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('contactDetails', item)}>
+                                    <View>
+                                        {
+                                            item.photo != 'N/A'
+                                                ?
+                                                <Image style={styles.image} width={50} height={50} source={{ uri: item.photo }} ></Image>
+                                                :
+                                                <Image style={styles.image} width={50} height={50} source={require('../assets/img/account.png')}></Image>
+                                        }
+                                    </View>
+                                    <View style={styles.viewText}>
+                                        <Text style={styles.textCard}>{item.firstName} {item.lastName}</Text>
+                                        <Text style={styles.textCard2}>{`Age ${item.age}`}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <View style={styles.line2}></View>
+                            </>
+                        }
+                        keyExtractor={(item) => item.id}
+                    />
+                </View>
+            }
             <View>
                 <TouchableOpacity
                     style={styles.btnAdd}
@@ -151,6 +155,15 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         marginRight: 30,
         justifyContent: 'center',
+    },
+    container: {
+        flex: 1,
+        justifyContent: "center"
+    },
+    horizontal: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 10
     },
 })
 

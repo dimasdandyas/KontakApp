@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, FlatList, ActivityIndicator, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icons from 'react-native-vector-icons/Feather';
@@ -12,6 +12,7 @@ import storage from '@react-native-firebase/storage';
 import { postContact } from '../services/contact.services';
 import { PostContact } from '../redux/action/contact.action';
 import { RefreshContact } from '../redux/action/contact.action';
+import validateContact from '../validation/contact.validation';
 
 function AddContacts() {
 
@@ -25,6 +26,8 @@ function AddContacts() {
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
     const [photo, setPhoto] = useState('')
+    const [msg, setMsg] = useState("")
+    const [loading, setLoading] = useState(false)
 
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
@@ -32,10 +35,11 @@ function AddContacts() {
             setPhoto(res.assets[0].uri)
             console.log('ini poto', photo)
             const reference = storage().ref('/photos/' + res.assets[0].fileName)
-
             await reference.putFile(res.assets[0].uri)
+            setLoading(true)
             const url = await reference.getDownloadURL()
             setPhoto(url)
+            setLoading(false)
             console.log(url);
         })
     }
@@ -49,16 +53,23 @@ function AddContacts() {
             photo: photo,
         }
         console.log(newContact)
-        postContact(newContact)
-            .then(res => {
-                console.log(res)
-                dispatch(RefreshContact(newContact))
+        let messageError = validateContact(firstName, lastName, age, photo)
+        if (validateContact(firstName, lastName, age, photo) == '') {
+            postContact(newContact)
+                .then(res => {
+                    console.log(res)
+                    dispatch(RefreshContact(newContact))
+                    navigation.navigate('home')
+                    ToastAndroid.show("Add contact succes!", ToastAndroid.LONG);
+                })
+                .catch(error => {
+                    console.log(error)
+                    ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+                })
+        } else {
+            setMsg(messageError)
+        }
 
-                navigation.navigate('home')
-            })
-            .catch(error => {
-                console.log(error)
-            })
     }
 
     return (
@@ -74,9 +85,16 @@ function AddContacts() {
                 </TouchableOpacity>
             </View>
             <View style={{ flex: 1, marginTop: 20 }}>
-                <TouchableOpacity onPress={chooseFile}>
-                    <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
-                </TouchableOpacity>
+                {loading ?
+                <>
+                    <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> 
+                    <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text> 
+                </>:
+                    <TouchableOpacity onPress={chooseFile}>
+                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
+                    </TouchableOpacity>
+                }
+                
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`First Name`}</Text>
                     <TextInput
@@ -99,6 +117,7 @@ function AddContacts() {
                     />
                 </View>
             </View>
+            {msg != '' && <Text style={styles.msgError}>{msg}</Text>}
         </ScrollView>
     )
 }
@@ -184,7 +203,11 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: 18,
         marginTop: 5,
-    }
+    },
+    msgError: {
+        color: 'red',
+        alignSelf: 'center',
+    },
 })
 
 export default AddContacts

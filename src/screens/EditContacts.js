@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity, TextInput } from 'react-native';
-import ActionButton from 'react-native-action-button';
+import { Alert, Text, View, StyleSheet, ScrollView, Image, ActivityIndicator, ToastAndroid, TouchableOpacity, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icons from 'react-native-vector-icons/Feather';
-import { createStackNavigator } from '@react-navigation/stack';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteContact, putContact } from '../services/contact.services';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import { RefreshContact } from '../redux/action/contact.action';
+import validateContact from '../validation/contact.validation';
 
 function EditContacts() {
 
@@ -22,6 +20,8 @@ function EditContacts() {
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
     const [photo, setPhoto] = useState('')
+    const [msg, setMsg] = useState("")
+    const [loading, setLoading] = useState(false)
 
     useFocusEffect(useCallback(() => {
 
@@ -44,15 +44,17 @@ function EditContacts() {
             setPhoto(res.assets[0].uri)
             console.log('ini poto', photo)
             const reference = storage().ref('/photos/' + res.assets[0].fileName)
-
             await reference.putFile(res.assets[0].uri)
+            setLoading(true)
             const url = await reference.getDownloadURL()
             setPhoto(url)
+            setLoading(false)
             console.log(url);
         })
     }
 
     function UpdateContact() {
+        let messageError = validateContact(firstName, lastName, age, photo)
         console.log('edit contact')
         const updateContact = {
             firstName: firstName,
@@ -61,16 +63,21 @@ function EditContacts() {
             photo: photo,
         }
         console.log('edit', updateContact)
-        putContact(updateContact, id)
-            .then(res => {
-                console.log(res)
-                dispatch(RefreshContact(updateContact))
-
-                navigation.navigate('home')
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        if (validateContact(firstName, lastName, age, photo) == '') {
+            putContact(updateContact, id)
+                .then(res => {
+                    console.log(res)
+                    dispatch(RefreshContact(updateContact))
+                    navigation.navigate('home')
+                    ToastAndroid.show("Edit contact succes!", ToastAndroid.LONG);
+                })
+                .catch(error => {
+                    console.log(error)
+                    ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+                })
+        } else {
+            setMsg(messageError)
+        }
     }
 
     return (
@@ -85,10 +92,16 @@ function EditContacts() {
                         style={{ marginRight: 20, marginTop: 15, }} />
                 </TouchableOpacity>
             </View>
-            <View style={{ flex: 1, marginTop: 20 }}>
-                <TouchableOpacity onPress={chooseFile}>
-                    <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
-                </TouchableOpacity>
+            <View>
+                {loading ?
+                    <>
+                        <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
+                        <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
+                    </> :
+                    <TouchableOpacity onPress={chooseFile}>
+                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
+                    </TouchableOpacity>
+                }
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`First Name`}</Text>
                     <TextInput
@@ -114,6 +127,7 @@ function EditContacts() {
                     />
                 </View>
             </View>
+            {msg != '' && <Text style={styles.msgError}>{msg}</Text>}
         </ScrollView>
     )
 }
@@ -199,7 +213,11 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: 18,
         marginTop: 5,
-    }
+    },
+    msgError: {
+        color: 'red',
+        alignSelf: 'center',
+    },
 })
 
 export default EditContacts

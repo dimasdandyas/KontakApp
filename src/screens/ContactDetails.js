@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Text, View, StyleSheet, ScrollView, Image, FlatList, ImageBackground, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
+import { Alert, Text, View, StyleSheet, ScrollView, Image, ActivityIndicator, ImageBackground, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icons from 'react-native-vector-icons/Feather';
@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getContactId } from '../services/contact.services';
-import {deleteContact} from '../services/contact.services'
+import { deleteContact } from '../services/contact.services'
 
 function ContactDetails() {
 
@@ -19,6 +19,7 @@ function ContactDetails() {
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
     const [photo, setPhoto] = useState()
+    const [loading, setLoading] = useState(false)
 
     useFocusEffect(useCallback(() => {
 
@@ -26,6 +27,7 @@ function ContactDetails() {
 
     useEffect(() => {
         console.log(route.params)
+        setLoading(true)
         getContactId(route.params.id)
             .then(res => {
                 setId(res.data.id)
@@ -38,12 +40,15 @@ function ContactDetails() {
             .catch(error => {
 
             })
+            .finally(() => {
+                setLoading(false)
+            })
     }, [])
 
-    
-    function AlertDelete (id) {
-        Alert.alert (
-            "Delete this contact ?", "", 
+
+    function AlertDelete(id) {
+        Alert.alert(
+            "Delete this contact ?", "",
             [
                 {
                     text: "No",
@@ -57,14 +62,13 @@ function ContactDetails() {
         );
     }
 
-    function deleteContactList (id) {
+    function deleteContactList(id) {
         deleteContact(id)
-        .then(res => {
-            dispatch(DeleteContact(id))
-        }, (error) => {
-            // console.log("error", error.data)
-            ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-        })
+            .then(res => {
+                dispatch(DeleteContact(id))
+            }, (error) => {
+                ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+            })
     }
 
     return (
@@ -74,55 +78,60 @@ function ContactDetails() {
                     style={{ alignSelf: 'flex-start', marginLeft: 10, marginTop: 15, }}
                     onPress={() => navigation.goBack()} />
             </View>
-            <View style={{ flex: 1, marginTop: 15 }}>
-                <View>
-                    {
-                        photo != 'N/A'
-                            ?
-                            <Image style={styles.image} width={150} height={150} source={{ uri: photo }} ></Image>
-                            :
-                            <Image style={styles.image} width={150} height={150} source={require('../assets/img/account.png')}></Image>
-                    }
+            {loading ?
+                <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
+                <View style={{ flex: 1, marginTop: 15 }}>
+                    <View style={{ flex: 1, marginTop: 15 }}>
+                        <View>
+                            {
+                                photo != 'N/A'
+                                    ?
+                                    <Image style={styles.image} width={150} height={150} source={{ uri: photo }} ></Image>
+                                    :
+                                    <Image style={styles.image} width={150} height={150} source={require('../assets/img/account.png')}></Image>
+                            }
+                        </View>
+                        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                            <Text style={styles.textCard}>{`First Name`}</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                defaultValue={firstName}
+                                editable={false}
+                            />
+                        </View>
+                        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                            <Text style={styles.textCard}>{`Last Name`}</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                defaultValue={lastName}
+                                editable={false}
+                            />
+                        </View>
+                        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                            <Text style={styles.textCard}>{`Age`}</Text>
+                            <TextInput
+                                style={styles.textInput}
+                                defaultValue={age}
+                                editable={false}
+                            />
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <TouchableOpacity
+                            style={styles.btn}
+                            onPress={() => navigation.navigate('editContacts', { item: { id, firstName, lastName, age, photo } })}>
+                            <Icons name="edit" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
+                            <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.btn}
+                            onPress={() => AlertDelete(id)}>
+                            <Icons name="x" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
+                            <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                    <Text style={styles.textCard}>{`First Name`}</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        defaultValue={firstName}
-                        editable={false}
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                    <Text style={styles.textCard}>{`Last Name`}</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        defaultValue={lastName}
-                        editable={false}
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-                    <Text style={styles.textCard}>{`Age`}</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        defaultValue={age}
-                        editable={false}
-                    />
-                </View>
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <TouchableOpacity
-                    style={styles.btn}
-                    onPress={() => navigation.navigate('editContacts', {item : {id, firstName, lastName, age, photo}})}>
-                    <Icons name="edit" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
-                    <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.btn}
-                    onPress={() => AlertDelete(id)}>
-                    <Icons name="x" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
-                    <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Delete</Text>
-                </TouchableOpacity>
-            </View>
+            }
         </View>
     )
 }
