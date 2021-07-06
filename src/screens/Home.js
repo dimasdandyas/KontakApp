@@ -56,7 +56,7 @@ function Home() {
                                 <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('contactDetails', item)}>
                                     <View>
                                         {
-                                            item.photo != 'Default'
+                                            item.photo != 'N/A'
                                                 ?
                                                 <Image style={styles.image} width={50} height={50} source={{ uri: item.photo }} ></Image>
                                                 :

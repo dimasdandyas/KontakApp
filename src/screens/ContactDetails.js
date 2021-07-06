@@ -83,7 +83,7 @@ function ContactDetails() {
                     <View style={{ flex: 1 }}>
                         <View>
                             {
-                                photo != 'Default'
+                                photo != 'N/A'
                                     ?
                                     <Image style={styles.image} width={150} height={150} source={{ uri: photo }} ></Image>
                                     :
