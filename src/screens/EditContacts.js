@@ -7,7 +7,8 @@ import { deleteContact, putContact } from '../services/contact.services';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import { RefreshContact } from '../redux/action/contact.action';
-import validateContact from '../validation/contact.validation';
+import { validateContact } from '../validation/contact.validation';
+import Icons from 'react-native-vector-icons/Feather';
 
 function EditContacts() {
 
@@ -22,6 +23,7 @@ function EditContacts() {
     const [photo, setPhoto] = useState('')
     const [msg, setMsg] = useState("")
     const [loading, setLoading] = useState(false)
+    const [btnDisable, setBtnDisable] = useState(false)
 
     useFocusEffect(useCallback(() => {
 
@@ -40,7 +42,7 @@ function EditContacts() {
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
             if (res.didCancel == true) {
-                ToastAndroid.show("Cancel edited image", ToastAndroid.LONG);
+
             } else {
                 setPhoto(res.assets[0].uri)
                 const reference = storage().ref('/photos/' + res.assets[0].fileName)
@@ -62,6 +64,7 @@ function EditContacts() {
             photo: photo,
         }
         if (validateContact(firstName, lastName, age, photo) == '') {
+            setBtnDisable(true)
             putContact(updateContact, id)
                 .then(res => {
                     dispatch(RefreshContact(updateContact))
@@ -71,8 +74,12 @@ function EditContacts() {
                 .catch(error => {
                     ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
                 })
+                .finally(() => setBtnDisable(false))
         } else {
             setMsg(messageError)
+            setTimeout(() => {
+                setMsg(messageError == '')
+            }, 1500)
         }
     }
 
@@ -83,7 +90,7 @@ function EditContacts() {
                     style={{ marginLeft: 10, marginTop: 15, }}
                     onPress={() => navigation.goBack()} />
                 <Text style={styles.title}>{`Edit Contact`}</Text>
-                <TouchableOpacity onPress={() => UpdateContact()} >
+                <TouchableOpacity onPress={() => UpdateContact()} disabled={btnDisable ? true : false}>
                     <Icon name="check" size={35} color="#7E7E7E"
                         style={{ marginRight: 20, marginTop: 15, }} />
                 </TouchableOpacity>
@@ -94,9 +101,12 @@ function EditContacts() {
                         <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
                         <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
                     </> :
-                    <TouchableOpacity onPress={chooseFile}>
+                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30 }}>
                         <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={chooseFile} style={{ alignSelf: 'flex-end' }}>
+                            <Icons name="edit" size={30} color="#7E7E7E" />
+                        </TouchableOpacity>
+                    </View>
                 }
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
                     <Text style={styles.textCard}>{`First Name`}</Text>
@@ -163,8 +173,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         backgroundColor: '#645DAF',
         alignSelf: 'center',
-        marginBottom: 35,
-        marginTop: 10,
+
     },
     viewText: {
 

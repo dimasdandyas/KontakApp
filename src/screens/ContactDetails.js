@@ -79,8 +79,8 @@ function ContactDetails() {
             </View>
             {loading ?
                 <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
-                <View style={{ flex: 1, marginTop: 15 }}>
-                    <View style={{ flex: 1, marginTop: 15 }}>
+                <View style={{ flex: 1, marginTop: 10 }}>
+                    <View style={{ flex: 1 }}>
                         <View>
                             {
                                 photo != 'N/A'

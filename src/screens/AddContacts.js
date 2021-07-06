@@ -7,7 +7,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import { postContact } from '../services/contact.services';
 import { RefreshContact } from '../redux/action/contact.action';
-import validateContact from '../validation/contact.validation';
+import { validateContact, validatePhoto } from '../validation/contact.validation';
 
 function AddContacts() {
 
@@ -23,11 +23,12 @@ function AddContacts() {
     const [photo, setPhoto] = useState('')
     const [msg, setMsg] = useState("")
     const [loading, setLoading] = useState(false)
+    const [btnDisable, setBtnDisable] = useState(false)
 
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
             if (res.didCancel == true) {
-                ToastAndroid.show("Cancel added image", ToastAndroid.LONG);
+                
             } else {
                 setPhoto(res.assets[0].uri)
                 const reference = storage().ref('/photos/' + res.assets[0].fileName)
@@ -49,6 +50,7 @@ function AddContacts() {
         }
         let messageError = validateContact(firstName, lastName, age, photo)
         if (validateContact(firstName, lastName, age, photo) == '') {
+            setBtnDisable(true)
             postContact(newContact)
                 .then(res => {
                     dispatch(RefreshContact(newContact))
@@ -58,10 +60,14 @@ function AddContacts() {
                 .catch(error => {
                     ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
                 })
+                .finally(() => setBtnDisable(false))
+
         } else {
             setMsg(messageError)
+            setTimeout(() => {
+                setMsg(messageError == '')
+            }, 1500)
         }
-
     }
 
     return (
@@ -71,7 +77,7 @@ function AddContacts() {
                     style={{ marginLeft: 10, marginTop: 15, }}
                     onPress={() => navigation.goBack()} />
                 <Text style={styles.title}>{`Add Contact`}</Text>
-                <TouchableOpacity onPress={() => NewContact()} >
+                <TouchableOpacity onPress={() => NewContact()} disabled={btnDisable ? true : false}>
                     <Icon name="check" size={35} color="#7E7E7E"
                         style={{ marginRight: 20, marginTop: 15, }} />
                 </TouchableOpacity>
@@ -83,7 +89,7 @@ function AddContacts() {
                         <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
                     </> :
                     <TouchableOpacity onPress={chooseFile}>
-                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
+                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/add-user.png') : { uri: photo }}></Image>
                     </TouchableOpacity>
                 }
 
