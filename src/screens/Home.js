@@ -48,7 +48,7 @@ function Home() {
 
             {loading ?
                 <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
-                <View style={{ flex: 1, flexDirection: 'column', alignSelf: 'center', marginTop: 10 }}>
+                <View style={{ flex: 1, alignSelf: 'center', marginTop: 16, marginBottom: 16 }}>
                     <FlatList
                         data={assignState}
                         renderItem={({ item }) =>
@@ -56,7 +56,7 @@ function Home() {
                                 <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('contactDetails', item)}>
                                     <View>
                                         {
-                                            item.photo != 'N/A'
+                                            item.photo != 'Default'
                                                 ?
                                                 <Image style={styles.image} width={50} height={50} source={{ uri: item.photo }} ></Image>
                                                 :
@@ -65,7 +65,7 @@ function Home() {
                                     </View>
                                     <View style={styles.viewText}>
                                         <Text style={styles.textCard}>{item.firstName} {item.lastName}</Text>
-                                        <Text style={styles.textCard2}>{`Age ${item.age}`}</Text>
+                                        <Text style={styles.textCard2}>{`${item.age} years old`}</Text>
                                     </View>
                                 </TouchableOpacity>
                                 <View style={styles.line2}></View>
@@ -73,7 +73,7 @@ function Home() {
                         }
                         keyExtractor={(item) => item.id}
                     />
-                    <View>
+                    <View style={{bottom : 0, right : 0, position : 'absolute'}}>
                         <TouchableOpacity
                             style={styles.btnAdd}
                             onPress={() => navigation.navigate('addContacts')}>

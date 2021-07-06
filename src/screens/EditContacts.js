@@ -77,9 +77,6 @@ function EditContacts() {
                 .finally(() => setBtnDisable(false))
         } else {
             setMsg(messageError)
-            setTimeout(() => {
-                setMsg(messageError == '')
-            }, 1500)
         }
     }
 
@@ -104,7 +101,7 @@ function EditContacts() {
                     <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30 }}>
                         <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
                         <TouchableOpacity onPress={chooseFile} style={{ alignSelf: 'flex-end' }}>
-                            <Icons name="edit" size={30} color="#7E7E7E" />
+                            <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20}}/>
                         </TouchableOpacity>
                     </View>
                 }
@@ -128,6 +125,7 @@ function EditContacts() {
                     <Text style={styles.textCard}>{`Age`}</Text>
                     <TextInput
                         style={styles.textInput}
+                        keyboardType={'numeric'}
                         defaultValue={age}
                         onChangeText={age => setAge(age)}
                     />

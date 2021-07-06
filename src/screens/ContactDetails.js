@@ -71,7 +71,7 @@ function ContactDetails() {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+        <ScrollView style={{ flex: 1, backgroundColor: '#FFF' }}>
             <View style={styles.topbar}>
                 <Icon name="chevron-left" size={40} color="#7E7E7E"
                     style={{ alignSelf: 'flex-start', marginLeft: 10, marginTop: 15, }}
@@ -83,7 +83,7 @@ function ContactDetails() {
                     <View style={{ flex: 1 }}>
                         <View>
                             {
-                                photo != 'N/A'
+                                photo != 'Default'
                                     ?
                                     <Image style={styles.image} width={150} height={150} source={{ uri: photo }} ></Image>
                                     :
@@ -131,7 +131,7 @@ function ContactDetails() {
                     </View>
                 </View>
             }
-        </View>
+        </ScrollView>
     )
 }
 

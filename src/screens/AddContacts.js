@@ -8,6 +8,7 @@ import storage from '@react-native-firebase/storage';
 import { postContact } from '../services/contact.services';
 import { RefreshContact } from '../redux/action/contact.action';
 import { validateContact, validatePhoto } from '../validation/contact.validation';
+import Icons from 'react-native-vector-icons/Feather';
 
 function AddContacts() {
 
@@ -28,7 +29,7 @@ function AddContacts() {
     function chooseFile() {
         launchImageLibrary({}, async function (res) {
             if (res.didCancel == true) {
-                
+
             } else {
                 setPhoto(res.assets[0].uri)
                 const reference = storage().ref('/photos/' + res.assets[0].fileName)
@@ -64,9 +65,6 @@ function AddContacts() {
 
         } else {
             setMsg(messageError)
-            setTimeout(() => {
-                setMsg(messageError == '')
-            }, 1500)
         }
     }
 
@@ -82,15 +80,18 @@ function AddContacts() {
                         style={{ marginRight: 20, marginTop: 15, }} />
                 </TouchableOpacity>
             </View>
-            <View style={{ flex: 1, marginTop: 20 }}>
+            <View style={{ flex: 1 }}>
                 {loading ?
                     <>
                         <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
                         <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
                     </> :
-                    <TouchableOpacity onPress={chooseFile}>
-                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/add-user.png') : { uri: photo }}></Image>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30 }}>
+                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
+                        <TouchableOpacity onPress={chooseFile} style={{ alignSelf: 'flex-end' }}>
+                            <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20 }} />
+                        </TouchableOpacity>
+                    </View>
                 }
 
                 <View style={{ flexDirection: 'row', marginBottom: 20 }}>
@@ -111,6 +112,7 @@ function AddContacts() {
                     <Text style={styles.textCard}>{`Age`}</Text>
                     <TextInput
                         style={styles.textInput}
+                        keyboardType={'numeric'}
                         onChangeText={age => setAge(age)}
                     />
                 </View>
@@ -155,8 +157,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         backgroundColor: '#645DAF',
         alignSelf: 'center',
-        marginBottom: 35,
-        marginTop: 10,
     },
     viewText: {
 
