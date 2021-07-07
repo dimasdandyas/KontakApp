@@ -90,7 +90,7 @@ function ContactDetails() {
                                     <Image style={styles.image} width={150} height={150} source={require('../assets/img/account.png')}></Image>
                             }
                         </View>
-                        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                        <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf:'center' }}>
                             <Text style={styles.textCard}>{`First Name`}</Text>
                             <TextInput
                                 style={styles.textInput}
@@ -98,7 +98,7 @@ function ContactDetails() {
                                 editable={false}
                             />
                         </View>
-                        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                        <View style={{ flexDirection: 'row', marginBottom: 20 , alignSelf:'center'}}>
                             <Text style={styles.textCard}>{`Last Name`}</Text>
                             <TextInput
                                 style={styles.textInput}
@@ -106,7 +106,7 @@ function ContactDetails() {
                                 editable={false}
                             />
                         </View>
-                        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                        <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf:'center' }}>
                             <Text style={styles.textCard}>{`Age`}</Text>
                             <TextInput
                                 style={styles.textInput}
@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
         width: 90,
         fontSize: 18,
         color: '#333',
-        marginLeft: 20,
         marginTop: 20,
         marginRight: 20,
     },
@@ -185,7 +184,6 @@ const styles = StyleSheet.create({
         width: 260,
         fontSize: 18,
         color: '#333',
-        marginLeft: 20,
         marginTop: 5,
     },
     btn: {

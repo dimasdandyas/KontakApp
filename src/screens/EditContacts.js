@@ -98,14 +98,14 @@ function EditContacts() {
                         <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
                         <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
                     </> :
-                    <View style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30 }}>
+                    <TouchableOpacity onPress={chooseFile} style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30,}}>
                         <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
-                        <TouchableOpacity onPress={chooseFile} style={{ alignSelf: 'flex-end' }}>
-                            <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20}}/>
-                        </TouchableOpacity>
-                    </View>
+                        <View style={{ alignSelf: 'flex-end' }}>
+                            <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20 }} />
+                        </View>
+                    </TouchableOpacity>
                 }
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf: 'center', }}>
                     <Text style={styles.textCard}>{`First Name`}</Text>
                     <TextInput
                         style={styles.textInput}
@@ -113,7 +113,7 @@ function EditContacts() {
                         onChangeText={firstName => setFirstName(firstName)}
                     />
                 </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf: 'center', }}>
                     <Text style={styles.textCard}>{`Last Name`}</Text>
                     <TextInput
                         style={styles.textInput}
@@ -121,7 +121,7 @@ function EditContacts() {
                         onChangeText={lastName => setLastName(lastName)}
                     />
                 </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf: 'center', }}>
                     <Text style={styles.textCard}>{`Age`}</Text>
                     <TextInput
                         style={styles.textInput}
@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
         width: 90,
         fontSize: 18,
         color: '#333',
-        marginLeft: 20,
         marginTop: 20,
         marginRight: 20,
     },
