@@ -68,8 +68,8 @@ function EditContacts() {
             putContact(updateContact, id)
                 .then(res => {
                     dispatch(RefreshContact(updateContact))
-                    navigation.navigate('home')
                     ToastAndroid.show("Edit contact succes!", ToastAndroid.LONG);
+                    navigation.navigate('home')
                 })
                 .catch(error => {
                     ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)

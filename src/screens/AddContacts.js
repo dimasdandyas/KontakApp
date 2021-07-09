@@ -55,8 +55,8 @@ function AddContacts() {
             postContact(newContact)
                 .then(res => {
                     dispatch(RefreshContact(newContact))
-                    navigation.navigate('home')
                     ToastAndroid.show("Add contact succes!", ToastAndroid.LONG);
+                    navigation.navigate('home')
                 })
                 .catch(error => {
                     ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
