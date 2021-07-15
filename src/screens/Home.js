@@ -4,159 +4,89 @@ import Icon from 'react-native-vector-icons/Feather';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getContacts } from '../services/contact.services';
-import { GetContacts } from '../redux/action/contact.action';
-import axios from 'axios'
+import axios from 'axios';
+import { fetchActionGet, fetchActionRefresh } from "../redux/action/contact.action";
+import FormStyle from '../assets/styles/FormStyle';
+import Photo from '../components/atoms/Photo';
+import ButtonIcon from '../components/atoms/ButtonIcon';
+import FieldForm from '../components/moleculs/FieldForm';
+import TextForm from '../components/atoms/TextForm';
 
 function Home() {
 
-    const assignState = useSelector((state) => state.contactReducer)
+    const data = useSelector(state => state.ContactReducer.data)
+    const loading = useSelector(state => state.ContactReducer.loading)
+    const error = useSelector(state => state.ContactReducer.error)
     const navigation = useNavigation()
     const dispatch = useDispatch()
-    const [data, setData] = useState('')
-    const [loading, setLoading] = useState(false)
-
-    const GetData = async () => {
-        try {
-            const data = await axios
-            if (assignState.length == 0) {
-                setLoading(true)
-                getContacts()
-                    .then(res => {
-                        dispatch(GetContacts(res.data))
-                    })
-                    .finally(() => {
-                        setLoading(false)
-                    })
-            }
-        }
-        catch (error) {
-            ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-        }
-    }
 
     useFocusEffect(useCallback(
         () => {
-            GetData()
-        }, [assignState]))
+            dispatch(fetchActionGet())
+        }, []))
+
+    useEffect(() => {
+
+    }, [data])
+
+    function RefreshPage() {
+        dispatch(fetchActionGet())
+    }
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <View style={styles.topbar}>
-                <Text style={styles.title}>All Contacts</Text>
+            <View style={FormStyle.topbarHome}>
+                <TextForm
+                    label='All Contacts'
+                    style={FormStyle.title}
+                />
+                <ButtonIcon
+                    onPress={() => RefreshPage()}
+                    name='repeat'
+                    size={25}
+                    style={FormStyle.iconRefresh}
+                />
             </View>
-            <View style={styles.line}></View>
-
+            <View style={FormStyle.line}></View>
+            {error && !loading && <Text>Error get data</Text>}
             {loading ?
                 <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
                 <View style={{ flex: 1, alignSelf: 'center', marginTop: 16, marginBottom: 16 }}>
                     <FlatList
-                        data={assignState}
+                        data={data}
                         renderItem={({ item }) =>
                             <>
-                                <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('contactDetails', item)}>
+                                <TouchableOpacity style={FormStyle.card} onPress={() => navigation.navigate('contactDetails', item)}>
                                     <View>
                                         {
                                             item.photo != 'N/A'
                                                 ?
-                                                <Image style={styles.image} width={50} height={50} source={{ uri: item.photo }} ></Image>
+                                                <Image style={FormStyle.imageAdd} width={50} height={50} source={{ uri: item.photo }} ></Image>
                                                 :
-                                                <Image style={styles.image} width={50} height={50} source={require('../assets/img/account.png')}></Image>
+                                                <Image style={FormStyle.imageAdd} width={50} height={50} source={require('../assets/img/account.png')}></Image>
                                         }
                                     </View>
-                                    <View style={styles.viewText}>
-                                        <Text style={styles.textCard}>{item.firstName} {item.lastName}</Text>
-                                        <Text style={styles.textCard2}>{`${item.age} years old`}</Text>
+                                    <View style={FormStyle.viewText}>
+                                        <Text style={FormStyle.textCardHome}>{item.firstName} {item.lastName}</Text>
+                                        <Text style={FormStyle.textCard2Home}>{`${item.age} years old`}</Text>
                                     </View>
                                 </TouchableOpacity>
-                                <View style={styles.line2}></View>
+                                <View style={FormStyle.line2}></View>
                             </>
                         }
                         keyExtractor={(item) => item.id}
                     />
-                    <View style={{bottom : 0, right : 0, position : 'absolute'}}>
+                    <View style={{ bottom: 0, right: 0, position: 'absolute' }}>
                         <TouchableOpacity
-                            style={styles.btnAdd}
+                            style={FormStyle.floatingButton}
                             onPress={() => navigation.navigate('addContacts')}>
                             <Icon name="plus" size={35} color="#FFF" style={{ alignSelf: 'center' }} />
                         </TouchableOpacity>
                     </View>
                 </View>
             }
-
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    topbar: {
-        height: 50,
-        backgroundColor: '#FFF',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 17,
-        marginLeft: 20,
-    },
-    line: {
-        height: 1,
-        backgroundColor: '#CACACA',
-    },
-    line2: {
-        width: 350,
-        height: 1,
-        backgroundColor: '#CACACA',
-        alignSelf: 'center',
-        marginTop: 10
-    },
-    card: {
-        width: 350,
-        height: 70,
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'center',
-        marginTop: 10
-    },
-    image: {
-        borderRadius: 100,
-        backgroundColor: '#645DAF'
-    },
-    viewText: {
-
-    },
-    textCard: {
-        width: 260,
-        fontSize: 18,
-        color: '#333',
-        marginLeft: 20,
-
-    },
-    textCard2: {
-        width: 260,
-        fontSize: 18,
-        color: '#333',
-        marginLeft: 20,
-        marginTop: 5,
-
-    },
-    btnAdd: {
-        width: 70,
-        height: 70,
-        backgroundColor: '#645DAF',
-        borderRadius: 100,
-        alignSelf: 'flex-end',
-        marginTop: 15,
-        marginBottom: 30,
-        justifyContent: 'center',
-    },
-    container: {
-        flex: 1,
-        justifyContent: "center"
-    },
-    horizontal: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        padding: 10
-    },
-})
 
 export default Home

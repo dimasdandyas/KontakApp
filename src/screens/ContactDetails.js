@@ -6,19 +6,33 @@ import Icons from 'react-native-vector-icons/Feather';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getContactId } from '../services/contact.services';
-import { deleteContact } from '../services/contact.services'
+import { deleteContact } from '../services/contact.services';
+import { fetchActionDelete } from '../redux/action/contact.action';
+import Photo from '../components/atoms/Photo';
+import ButtonEdit from '../components/atoms/ButtonEdit';
+import ButtonDelete from '../components/atoms/ButtonDelete';
+import ButtonIcon from '../components/atoms/ButtonIcon';
+import FieldForm from '../components/moleculs/FieldForm';
+import FormStyle from '../assets/styles/FormStyle';
 
 function ContactDetails() {
 
+    const loading = useSelector(state => state.ContactReducer.loading)
+    const error = useSelector(state => state.ContactReducer.error)
+    const data = useSelector(state => state.ContactReducer.dataDelete)
+
     const navigation = useNavigation()
+    const dispatch = useDispatch()
     const route = useRoute()
-    const [data, setData] = useState('')
+    // const [data, setData] = useState('')
     const [id, setId] = useState('')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
     const [photo, setPhoto] = useState()
-    const [loading, setLoading] = useState(false)
+    const [loadings, setLoading] = useState(false)
+    const [msgError, setMsgError] = useState('')
+    const [init, setInit] = useState(false)
 
     useFocusEffect(useCallback(() => {
 
@@ -35,14 +49,27 @@ function ContactDetails() {
                 setAge(age.toString())
                 setPhoto(res.data.photo)
             })
-            .catch(error => {
-
-            })
             .finally(() => {
                 setLoading(false)
             })
     }, [])
 
+    useEffect(() => {
+        if (init == true) {
+            if (error) {
+                ToastAndroid.show(error, ToastAndroid.LONG)
+            }
+            else {
+                navigation.navigate('home')
+            }
+        } else {
+            setInit(true)
+        }
+    }, [error])
+
+    function deleteContactList(id) {
+        dispatch(fetchActionDelete(id))
+    }
 
     function AlertDelete(id) {
         Alert.alert(
@@ -60,152 +87,47 @@ function ContactDetails() {
         );
     }
 
-    function deleteContactList(id) {
-        deleteContact(id)
-            .then(res => {
-                dispatch(DeleteContact(id))
-                ToastAndroid.show("Success removes contact", ToastAndroid.LONG)
-            }, (error) => {
-                ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-            })
-    }
-
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <View style={styles.topbar}>
-                <Icon name="chevron-left" size={40} color="#7E7E7E"
-                    style={{ alignSelf: 'flex-start', marginLeft: 10, marginTop: 15, }}
-                    onPress={() => navigation.goBack()} />
-            </View>
+            <ButtonIcon
+                onPress={() => navigation.goBack()}
+                name='chevron-left'
+                size={40}
+                style={FormStyle.iconBack}
+            />
             {loading ?
                 <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
                 <View style={{ flex: 1, marginTop: 10 }}>
                     <View style={{ flex: 1 }}>
-                        <View>
-                            {
-                                photo != 'N/A'
-                                    ?
-                                    <Image style={styles.image} width={150} height={150} source={{ uri: photo }} ></Image>
-                                    :
-                                    <Image style={styles.image} width={150} height={150} source={require('../assets/img/account.png')}></Image>
-                            }
-                        </View>
-                        <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf:'center' }}>
-                            <Text style={styles.textCard}>{`First Name`}</Text>
-                            <TextInput
-                                style={styles.textInput}
-                                defaultValue={firstName}
-                                editable={false}
-                            />
-                        </View>
-                        <View style={{ flexDirection: 'row', marginBottom: 20 , alignSelf:'center'}}>
-                            <Text style={styles.textCard}>{`Last Name`}</Text>
-                            <TextInput
-                                style={styles.textInput}
-                                defaultValue={lastName}
-                                editable={false}
-                            />
-                        </View>
-                        <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf:'center' }}>
-                            <Text style={styles.textCard}>{`Age`}</Text>
-                            <TextInput
-                                style={styles.textInput}
-                                defaultValue={age}
-                                editable={false}
-                            />
-                        </View>
+                        <Photo photo={photo} />
+                        <FieldForm
+                            label='First Name'
+                            defaultValue={firstName}
+                            editable={false}
+                        />
+                        <FieldForm
+                            label='Last Name'
+                            defaultValue={lastName}
+                            editable={false}
+                        />
+                        <FieldForm
+                            label='Age'
+                            defaultValue={age}
+                            editable={false}
+                        />
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                        <TouchableOpacity
-                            style={styles.btn}
+                        <ButtonEdit
                             onPress={() => navigation.navigate('editContacts', { item: { id, firstName, lastName, age, photo } })}>
-                            <Icons name="edit" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
-                            <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Edit</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.btn}
+                        </ButtonEdit>
+                        <ButtonDelete
                             onPress={() => AlertDelete(id)}>
-                            <Icons name="x" size={30} color="#7E7E7E" style={{ alignSelf: 'center' }} />
-                            <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 5 }}>Delete</Text>
-                        </TouchableOpacity>
+                        </ButtonDelete>
                     </View>
                 </View>
             }
         </ScrollView>
     )
 }
-
-const styles = StyleSheet.create({
-    topbar: {
-        height: 50,
-        backgroundColor: '#FFF',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 17,
-        marginLeft: 20,
-    },
-    line: {
-        height: 1,
-        backgroundColor: '#CACACA',
-    },
-    line2: {
-        width: 350,
-        height: 1,
-        backgroundColor: '#CACACA',
-        alignSelf: 'center',
-        marginTop: 10
-    },
-    card: {
-        width: 350,
-        height: 70,
-        flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: 'center',
-        marginTop: 10
-    },
-    image: {
-        borderRadius: 100,
-        alignSelf: 'center',
-        marginBottom: 35,
-        marginTop: 10,
-    },
-    viewText: {
-
-    },
-    textCard: {
-        width: 90,
-        fontSize: 18,
-        color: '#333',
-        marginTop: 20,
-        marginRight: 20,
-    },
-    textCard2: {
-        width: 260,
-        fontSize: 18,
-        color: '#333',
-        marginTop: 5,
-    },
-    btn: {
-        width: 50,
-        height: 50,
-        borderRadius: 100,
-        alignSelf: 'flex-end',
-        marginTop: 15,
-        marginBottom: 30,
-        justifyContent: 'center',
-        marginHorizontal: 10,
-    },
-    textInput: {
-        width: 250,
-        height: 50,
-        backgroundColor: '#F2F2F2',
-        borderRadius: 10,
-        padding: 15,
-        color: '#333',
-        fontSize: 18,
-        marginTop: 5,
-    }
-})
 
 export default ContactDetails

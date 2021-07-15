@@ -6,11 +6,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteContact, putContact } from '../services/contact.services';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import { RefreshContact } from '../redux/action/contact.action';
+import { fetchActionUpdate } from '../redux/action/contact.action';
 import { validateContact } from '../validation/contact.validation';
 import Icons from 'react-native-vector-icons/Feather';
+import FormStyle from '../assets/styles/FormStyle';
+import Photo from '../components/atoms/Photo';
+import ButtonIcon from '../components/atoms/ButtonIcon';
+import FieldForm from '../components/moleculs/FieldForm';
+import TextForm from '../components/atoms/TextForm';
 
 function EditContacts() {
+
+    const error = useSelector(state => state.ContactReducer.error)
 
     const navigation = useNavigation()
     const dispatch = useDispatch()
@@ -64,17 +71,16 @@ function EditContacts() {
             photo: photo,
         }
         if (validateContact(firstName, lastName, age, photo) == '') {
-            setBtnDisable(true)
-            putContact(updateContact, id)
-                .then(res => {
-                    dispatch(RefreshContact(updateContact))
-                    ToastAndroid.show("Edit contact succes!", ToastAndroid.LONG);
-                    navigation.navigate('home')
-                })
-                .catch(error => {
-                    ToastAndroid.showWithGravity(error.data.message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-                })
-                .finally(() => setBtnDisable(false))
+            if (!error) {
+                setBtnDisable(true)
+                dispatch(fetchActionUpdate(updateContact, id))
+                console.log(fetchActionUpdate(updateContact, id))
+                ToastAndroid.show("Success update contact!", ToastAndroid.LONG)
+                navigation.navigate('home')
+            } else {
+                ToastAndroid.show(error, ToastAndroid.LONG)
+                setBtnDisable(false)
+            }
         } else {
             setMsg(messageError)
         }
@@ -82,15 +88,23 @@ function EditContacts() {
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <View style={styles.topbar}>
-                <Icon name="chevron-left" size={40} color="#7E7E7E"
-                    style={{ marginLeft: 10, marginTop: 15, }}
-                    onPress={() => navigation.goBack()} />
-                <Text style={styles.title}>{`Edit Contact`}</Text>
-                <TouchableOpacity onPress={() => UpdateContact()} disabled={btnDisable ? true : false}>
-                    <Icon name="check" size={35} color="#7E7E7E"
-                        style={{ marginRight: 20, marginTop: 15, }} />
-                </TouchableOpacity>
+            <View style={FormStyle.topbarAdd}>
+                <ButtonIcon
+                    onPress={() => navigation.goBack()}
+                    name='chevron-left'
+                    size={40}
+                    style={FormStyle.iconBack}
+                />
+                <TextForm
+                    label='Edit Contact'
+                    style={FormStyle.titleAdd}
+                />
+                <ButtonIcon
+                    onPress={() => UpdateContact()} disabled={btnDisable ? true : false}
+                    name='check'
+                    size={35}
+                    style={FormStyle.iconSubmit}
+                />
             </View>
             <View>
                 {loading ?
@@ -98,38 +112,29 @@ function EditContacts() {
                         <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
                         <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
                     </> :
-                    <TouchableOpacity onPress={chooseFile} style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30,}}>
+                    <TouchableOpacity onPress={chooseFile} style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30, }}>
                         <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
                         <View style={{ alignSelf: 'flex-end' }}>
                             <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20 }} />
                         </View>
                     </TouchableOpacity>
                 }
-                <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf: 'center', }}>
-                    <Text style={styles.textCard}>{`First Name`}</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        defaultValue={firstName}
-                        onChangeText={firstName => setFirstName(firstName)}
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf: 'center', }}>
-                    <Text style={styles.textCard}>{`Last Name`}</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        defaultValue={lastName}
-                        onChangeText={lastName => setLastName(lastName)}
-                    />
-                </View>
-                <View style={{ flexDirection: 'row', marginBottom: 20, alignSelf: 'center', }}>
-                    <Text style={styles.textCard}>{`Age`}</Text>
-                    <TextInput
-                        style={styles.textInput}
-                        keyboardType={'numeric'}
-                        defaultValue={age}
-                        onChangeText={age => setAge(age)}
-                    />
-                </View>
+                <FieldForm
+                    label='First Name'
+                    defaultValue={firstName}
+                    onChangeText={firstName => setFirstName(firstName)}
+                />
+                <FieldForm
+                    label='Last Name'
+                    defaultValue={lastName}
+                    onChangeText={lastName => setLastName(lastName)}
+                />
+                <FieldForm
+                    label='Age'
+                    keyboardType={'numeric'}
+                    defaultValue={age}
+                    onChangeText={age => setAge(age)}
+                />
             </View>
             {msg != '' && <Text style={styles.msgError}>{msg}</Text>}
         </ScrollView>

@@ -7,13 +7,13 @@ const getContacts = async () => {
         const { data } = await axios.get(URL);
         return data;
     } catch (error) {
-        throw error.data
+        throw error.response
     }
 }
 
 const getContactId = async (id) => {
     try {
-        const { data } = await axios.get(URL+'/'+id);
+        const { data } = await axios.get(URL + '/' + id);
         return data;
     } catch (error) {
         throw error.response
@@ -31,7 +31,7 @@ const postContact = async (newContact) => {
 
 const putContact = async (updateContact, id) => {
     try {
-        const {data} = await axios.put(URL+'/'+id, updateContact);
+        const { data } = await axios.put(URL + '/' + id, updateContact);
         return data
     } catch (error) {
         throw error.response
@@ -40,12 +40,11 @@ const putContact = async (updateContact, id) => {
 
 const deleteContact = async (id) => {
     try {
-        const {data} = await axios.delete(URL+'/'+id);
+        const { data } = await axios.delete(URL + '/' + id);
         return data
     } catch (error) {
-        console.log("error ", error.response.data)
-        throw error.response
+        throw error.response.data
     }
 }
 
-export { getContacts, getContactId, postContact, putContact, deleteContact}
+export { getContacts, getContactId, postContact, putContact, deleteContact }
