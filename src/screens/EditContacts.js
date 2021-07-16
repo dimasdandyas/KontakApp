@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteContact, putContact } from '../services/contact.services';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import { fetchActionUpdate } from '../redux/action/contact.action';
+import { fetchActionUpdate, fetchClearError } from '../redux/action/contact.action';
 import { validateContact } from '../validation/contact.validation';
 import Icons from 'react-native-vector-icons/Feather';
 import FormStyle from '../assets/styles/FormStyle';
@@ -14,10 +14,12 @@ import Photo from '../components/atoms/Photo';
 import ButtonIcon from '../components/atoms/ButtonIcon';
 import FieldForm from '../components/moleculs/FieldForm';
 import TextForm from '../components/atoms/TextForm';
+import ChoosePhoto from '../components/moleculs/ChoosePhoto';
 
 function EditContacts() {
 
     const error = useSelector(state => state.ContactReducer.error)
+    const loading = useSelector(state => state.ContactReducer.loading)
 
     const navigation = useNavigation()
     const dispatch = useDispatch()
@@ -29,8 +31,9 @@ function EditContacts() {
     const [age, setAge] = useState('')
     const [photo, setPhoto] = useState('')
     const [msg, setMsg] = useState("")
-    const [loading, setLoading] = useState(false)
+    const [loadings, setLoadings] = useState(false)
     const [btnDisable, setBtnDisable] = useState(false)
+    const [init, setInit] = useState(false)
 
     useFocusEffect(useCallback(() => {
 
@@ -46,21 +49,21 @@ function EditContacts() {
         setPhoto(routes.item.photo)
     }, [])
 
-    function chooseFile() {
-        launchImageLibrary({}, async function (res) {
-            if (res.didCancel == true) {
-
-            } else {
-                setPhoto(res.assets[0].uri)
-                const reference = storage().ref('/photos/' + res.assets[0].fileName)
-                await reference.putFile(res.assets[0].uri)
-                setLoading(true)
-                const url = await reference.getDownloadURL()
-                setPhoto(url)
-                setLoading(false)
+    useEffect(() => {
+        if (init == true) {
+            if (error) {
+                dispatch(fetchClearError())
+                ToastAndroid.show(error, ToastAndroid.SHORT)
             }
-        })
-    }
+            else {
+                ToastAndroid.show("Success update contact!", ToastAndroid.LONG)
+                navigation.navigate('home')
+            }
+            setBtnDisable(false)
+        } else {
+            setInit(true)
+        }
+    }, [error, loading])
 
     function UpdateContact() {
         let messageError = validateContact(firstName, lastName, age, photo)
@@ -71,19 +74,27 @@ function EditContacts() {
             photo: photo,
         }
         if (validateContact(firstName, lastName, age, photo) == '') {
-            if (!error) {
-                setBtnDisable(true)
-                dispatch(fetchActionUpdate(updateContact, id))
-                console.log(fetchActionUpdate(updateContact, id))
-                ToastAndroid.show("Success update contact!", ToastAndroid.LONG)
-                navigation.navigate('home')
-            } else {
-                ToastAndroid.show(error, ToastAndroid.LONG)
-                setBtnDisable(false)
-            }
+            setBtnDisable(true)
+            dispatch(fetchActionUpdate(updateContact, id))
         } else {
             setMsg(messageError)
         }
+    }
+
+    function chooseFile() {
+        launchImageLibrary({}, async function (res) {
+            if (res.didCancel == true) {
+
+            } else {
+                setPhoto(res.assets[0].uri)
+                const reference = storage().ref('/photos/' + res.assets[0].fileName)
+                await reference.putFile(res.assets[0].uri)
+                setLoadings(true)
+                const url = await reference.getDownloadURL()
+                setPhoto(url)
+                setLoadings(false)
+            }
+        })
     }
 
     return (
@@ -110,14 +121,11 @@ function EditContacts() {
                 {loading ?
                     <>
                         <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
-                        <Text style={styles.msgError}>`Loading get image from URL... wait a second`</Text>
                     </> :
-                    <TouchableOpacity onPress={chooseFile} style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30, }}>
-                        <Image style={styles.image} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
-                        <View style={{ alignSelf: 'flex-end' }}>
-                            <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20 }} />
-                        </View>
-                    </TouchableOpacity>
+                    <ChoosePhoto
+                        onPress={chooseFile}
+                        photo={photo}
+                    />
                 }
                 <FieldForm
                     label='First Name'

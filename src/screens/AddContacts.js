@@ -8,16 +8,17 @@ import storage from '@react-native-firebase/storage';
 import { postContact } from '../services/contact.services';
 import { validateContact, validatePhoto } from '../validation/contact.validation';
 import Icons from 'react-native-vector-icons/Feather';
-import { fetchActionRefresh } from '../redux/action/contact.action';
+import { fetchActionRefresh, fetchActionAdd } from '../redux/action/contact.action';
 import FormStyle from '../assets/styles/FormStyle';
 import Photo from '../components/atoms/Photo';
 import ButtonIcon from '../components/atoms/ButtonIcon';
 import FieldForm from '../components/moleculs/FieldForm';
 import TextForm from '../components/atoms/TextForm';
+import ChoosePhoto from '../components/moleculs/ChoosePhoto';
 
 function AddContacts() {
 
-    const data = useSelector(state => state.ContactReducer.data)
+    const data = useSelector(state => state.ContactReducer.dataAdd)
     const loading = useSelector(state => state.ContactReducer.loading)
     const error = useSelector(state => state.ContactReducer.error)
     const navigation = useNavigation()
@@ -54,7 +55,6 @@ function AddContacts() {
         let messageError = validateContact(firstName, lastName, age, photo)
         if (validateContact(firstName, lastName, age, photo) == '') {
             setBtnDisable(true)
-            console.log(newContact)
             postContact(newContact)
                 .then(res => {
                     dispatch(fetchActionRefresh())
@@ -95,12 +95,11 @@ function AddContacts() {
                     <>
                         <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} />
                     </> :
-                    <TouchableOpacity onPress={chooseFile} style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 30, marginBottom: 30 }}>
-                        <Image style={FormStyle.imageAdd} width={150} height={150} source={photo == '' ? require('../assets/img/account.png') : { uri: photo }}></Image>
-                        <View style={{ alignSelf: 'flex-end' }}>
-                            <Icons name="edit" size={30} color="#F2BF7E" style={{ marginLeft: -20 }} />
-                        </View>
-                    </TouchableOpacity>
+
+                    <ChoosePhoto
+                        onPress={chooseFile}
+                        photo={photo}
+                    />
                 }
 
                 <FieldForm

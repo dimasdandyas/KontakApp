@@ -22,11 +22,13 @@ function Home() {
 
     useFocusEffect(useCallback(
         () => {
-            dispatch(fetchActionGet())
+            if( data.length < 1 ){
+                dispatch(fetchActionGet())
+            } 
         }, []))
 
     useEffect(() => {
-
+        dispatch(fetchActionRefresh())
     }, [data])
 
     function RefreshPage() {
@@ -48,7 +50,6 @@ function Home() {
                 />
             </View>
             <View style={FormStyle.line}></View>
-            {error && !loading && <Text>Error get data</Text>}
             {loading ?
                 <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 10 }} /> :
                 <View style={{ flex: 1, alignSelf: 'center', marginTop: 16, marginBottom: 16 }}>

@@ -7,7 +7,7 @@ import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/nativ
 import { useDispatch, useSelector } from 'react-redux';
 import { getContactId } from '../services/contact.services';
 import { deleteContact } from '../services/contact.services';
-import { fetchActionDelete } from '../redux/action/contact.action';
+import { fetchActionDelete, fetchClearError } from '../redux/action/contact.action';
 import Photo from '../components/atoms/Photo';
 import ButtonEdit from '../components/atoms/ButtonEdit';
 import ButtonDelete from '../components/atoms/ButtonDelete';
@@ -24,7 +24,6 @@ function ContactDetails() {
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const route = useRoute()
-    // const [data, setData] = useState('')
     const [id, setId] = useState('')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
@@ -57,11 +56,13 @@ function ContactDetails() {
     useEffect(() => {
         if (init == true) {
             if (error) {
-                ToastAndroid.show(error, ToastAndroid.LONG)
+                dispatch(fetchClearError())
+                ToastAndroid.show(error, ToastAndroid.SHORT)
             }
-            else {
-                navigation.navigate('home')
-            }
+            navigation.navigate('home')
+            // else {
+            //     navigation.navigate('home')
+            // }
         } else {
             setInit(true)
         }
